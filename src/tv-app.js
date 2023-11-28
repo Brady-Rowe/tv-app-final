@@ -4,6 +4,7 @@ import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "./tv-channel.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import "./course-title.js";
 
 export class TvApp extends LitElement {
   // defaults
@@ -19,6 +20,7 @@ export class TvApp extends LitElement {
     this.activeIndex = null; // To keep track of the active index
     this.activeContent = ""; // To store the active content HTML
     this.itemClick = this.itemClick.bind(this);
+    this.time = "";
   }
 
   connectedCallback() {
@@ -45,6 +47,7 @@ export class TvApp extends LitElement {
       id: { type: String },
       activeIndex: { type: Number },
       activeContent: { type: String },
+      time: { type: Number },
     };
   }
   // LitElement convention for applying styles JUST to our element
@@ -75,16 +78,16 @@ export class TvApp extends LitElement {
           padding-right: 5px;
         }
 
-       .main {
-        margin: 42px 141px 23px 386px;
-         padding-top: 8px;
-         padding-right: 5px;
-         padding-bottom: 1px;
-         padding-left: 20px;
-         width: calc(100% - 291px);
-         height: 100%;
-         font-size: 1em;
-         border: 1px solid #dadce0;
+        .main {
+          margin: 42px 141px 23px 386px;
+          padding-top: 8px;
+          padding-right: 5px;
+          padding-bottom: 1px;
+          padding-left: 20px;
+          width: calc(100% - 291px);
+          height: 100%;
+          font-size: 1em;
+          border: 1px solid #dadce0;
           border-radius: 5px;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow to the right */
           background-color: #f8f9fa; /* Keep the same background color */
@@ -94,8 +97,7 @@ export class TvApp extends LitElement {
           color: #4e5256;
           font-family: var(--devsite-primary-font-family);
           background: #f8f9fa;
-
-       }
+        }
 
         .fabs {
           display: flex;
@@ -105,10 +107,10 @@ export class TvApp extends LitElement {
           bottom: 0;
           right: 0;
           margin: 19px;
-          width: 75vw;
+          width: 81vw;
         }
 
-        #previous>button {
+        #previous > button {
           border-radius: 4px;
           font-family:
             Google Sans,
@@ -127,9 +129,12 @@ export class TvApp extends LitElement {
           background: #fff;
           color: #1a73e8;
           border: 0;
-          box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12), 0 3px 1px -2px rgba(0,0,0,.2);
+          box-shadow:
+            0 2px 2px 0 rgba(0, 0, 0, 0.14),
+            0 1px 5px 0 rgba(0, 0, 0, 0.12),
+            0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
-        #next>button {
+        #next > button {
           border-radius: 4px;
           font-family:
             Google Sans,
@@ -148,7 +153,10 @@ export class TvApp extends LitElement {
           background: #1a73e8;
           color: #fff;
           border: 0;
-          box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12), 0 3px 1px -2px rgba(0,0,0,.2);
+          box-shadow:
+            0 2px 2px 0 rgba(0, 0, 0, 0.14),
+            0 1px 5px 0 rgba(0, 0, 0, 0.12),
+            0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
       `,
     ];
@@ -156,6 +164,9 @@ export class TvApp extends LitElement {
 
   render() {
     return html`
+      <course-title time = "${this.time}"> 
+      
+      </course-title>
       <div class="alignContent">
         <div class="course-topics">
           ${this.listings.map(
@@ -244,6 +255,8 @@ export class TvApp extends LitElement {
     this.activeIndex = index;
     const item = this.listings[index].location;
     // console.log("Active Content", item);
+    this.time = this.listings[index].metadata.timecode;
+    console.log("Time", this.time);
 
     const contentPath = "/assets/" + item;
     // console.log("Content Path", contentPath);
@@ -283,6 +296,8 @@ export class TvApp extends LitElement {
           responseData.data.items.length > 0
         ) {
           this.listings = [...responseData.data.items];
+          // console.log("Listings", this.listings);
+          console.log("TimeCOde", this.listings);
         }
       });
   }

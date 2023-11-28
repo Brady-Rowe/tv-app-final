@@ -13,6 +13,8 @@ export class CourseTitle extends LitElement {
     this.title = "";
     this.presenter = "";
     this.id = "";
+    this.time = "";
+   
   }
   // convention I enjoy using to define the tag's name
   static get tag() {
@@ -24,6 +26,7 @@ export class CourseTitle extends LitElement {
       title: { type: String },
       presenter: { type: String },
       id: { type: String },
+      time: { type: String },
     };
   }
   // LitElement convention for applying styles JUST to our element
@@ -113,7 +116,7 @@ export class CourseTitle extends LitElement {
             role="timer"
             data-title="Estimated time remaining: 40 minutes"
           >
-            40 mins remaining
+            ${this.time}
           </div>
         </div>
 
