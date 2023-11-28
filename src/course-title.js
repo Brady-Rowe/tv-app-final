@@ -144,8 +144,9 @@ export class CourseTitle extends LitElement {
         <div class=""></div>
         <div class="">
           <div class="">
-            <a class="" aria-label="Google Account: Oj Akanbi (oakanbi13@gmail.com)" href="https://accounts.google.com/SignOutOptions?hl=en&amp;continue=https://codelabs.developers.google.com/_d/profile/ogb%3Fhl%3Den&amp;ec=GBRAywI" role="button" tabindex="0" id="devsite-signin-btn">
-              <img class="" style = "border-radius: 33px" href ="https://lh3.googleusercontent.com/ogw/AKPQZvzoUf_x8dNI-Nv_q2cF1O1_ZPavIMJqxzFvCMkRKg=s32-c-mo" srcset="https://lh3.googleusercontent.com/ogw/AKPQZvzoUf_x8dNI-Nv_q2cF1O1_ZPavIMJqxzFvCMkRKg=s32-c-mo 1x, https://lh3.googleusercontent.com/ogw/AKPQZvzoUf_x8dNI-Nv_q2cF1O1_ZPavIMJqxzFvCMkRKg=s64-c-mo 2x" alt="" aria-hidden="true" data-noaft="">
+            <a class="" aria-label="Google Account: Brady Rowe (bradyroweny@gmail.com)" href="https://accounts.google.com/SignOutOptions?hl=en&amp;continue=https://codelabs.developers.google.com/_d/profile/ogb%3Fhl%3Den&amp;ec=GBRAywI" role="button" tabindex="0" id="devsite-signin-btn">
+              <img class="" style = "border-radius: 33px" href ="https://lh3.googleusercontent.com/a/ACg8ocKF24gHFrpmH-ZMHX-UgaN5h8PiW-QYfb4qL-saKFdcQw=s32-c-no" 
+              srcset="https://lh3.googleusercontent.com/a/ACg8ocKF24gHFrpmH-ZMHX-UgaN5h8PiW-QYfb4qL-saKFdcQw=s32-c-no 1x, https://lh3.googleusercontent.com/a/ACg8ocKF24gHFrpmH-ZMHX-UgaN5h8PiW-QYfb4qL-saKFdcQw=s64-c-no 2x" alt="" aria-hidden="true" data-noaft="">
             </a>
           </div>
         </div>
