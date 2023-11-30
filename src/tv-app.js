@@ -7,10 +7,8 @@ import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import "./course-title.js";
 
 export class TvApp extends LitElement {
-  // defaults
   constructor() {
     super();
-    this.name = "";
     this.source = new URL("../assets/channels.json", import.meta.url).href;
     this.listings = [];
     this.id = "";
@@ -39,7 +37,7 @@ export class TvApp extends LitElement {
   static get properties() {
     return {
       name: { type: String },
-      source: { type: String },
+      source: { type: String }, // To fetch the JSON file
       listings: { type: Array },
       selectedCourse: { type: Object },
       currentPage: { type: Number },
@@ -47,7 +45,7 @@ export class TvApp extends LitElement {
       id: { type: String },
       activeIndex: { type: Number },
       activeContent: { type: String },
-      time: { type: Number },
+      // time: { type: String },
     };
   }
   // LitElement convention for applying styles JUST to our element
@@ -63,7 +61,7 @@ export class TvApp extends LitElement {
         .alignContent {
           display: flex;
           justify-content: flex-start;
-          gap: 90px; /* Optional: adjust the gap between course topics and main content */
+          gap: 90px; 
         }
 
         .course-topics {
@@ -89,8 +87,8 @@ export class TvApp extends LitElement {
           font-size: 1em;
           border: 1px solid #dadce0;
           border-radius: 5px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow to the right */
-          background-color: #f8f9fa; /* Keep the same background color */
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+          background-color: #f8f9fa; 
           font: 400 16px/24px var(--devsite-primary-font-family);
           -webkit-font-smoothing: antialiased;
           text-size-adjust: 100%;
@@ -230,12 +228,15 @@ export class TvApp extends LitElement {
     }
   }
 
+  // function to fetch the previous content
   async prevPage() {
     if (this.activeIndex !== null) {
-      const prevIndex =
+
+      const prevIndex = 
         this.activeIndex === 0
-          ? this.listings.length - 1
-          : this.activeIndex - 1;
+          ? this.listings.length - 1 
+          : this.activeIndex - 1; bcb
+      
       const item = this.listings[prevIndex].location;
 
       const contentPath = "/assets/" + item;
@@ -251,27 +252,25 @@ export class TvApp extends LitElement {
     }
   }
 
+  // Funtion to fetch for the content that is being clicked 
   async itemClick(index) {
     this.activeIndex = index;
-    const item = this.listings[index].location;
-    // console.log("Active Content", item);
-    this.time = this.listings[index].metadata.timecode;
-    console.log("Time", this.time);
+
+    const item = this.listings[index].location; // Get the location of the content
+    console.log("Active Content: ", item);
+
+    this.time = this.listings[index].metadata.timecode; // Get the timecode of the content
+    console.log("Time: ", this.time);
 
     const contentPath = "/assets/" + item;
-    // console.log("Content Path", contentPath);
 
     try {
       const response = await fetch(contentPath);
       const text = await response.text();
-      this.activeContent = text;
-      // console.log("Active Content", this.activeContent);
+      this.activeContent = text; // Update the active content after fetching
     } catch (err) {
       console.log("fetch failed", err);
     }
-
-    // const dialog = this.shadowRoot.querySelector('.dialog');
-    // dialog.show();
   }
 
   // LitElement life cycle for when any property changes
@@ -286,6 +285,7 @@ export class TvApp extends LitElement {
     });
   }
 
+  // API fetches the JSON file and updates the listings array
   async updateSourceData(source) {
     await fetch(source)
       .then((resp) => (resp.ok ? resp.json() : []))
@@ -295,12 +295,12 @@ export class TvApp extends LitElement {
           responseData.data.items &&
           responseData.data.items.length > 0
         ) {
-          this.listings = [...responseData.data.items];
-          // console.log("Listings", this.listings);
-          console.log("TimeCOde", this.listings);
+          this.listings = [...responseData.data.items]; // Spread operator to clone the array
+          console.log("Listings: ", this.listings);
         }
       });
   }
 }
+
 // tell the browser about our tag and class it should run when it sees it
 customElements.define(TvApp.tag, TvApp);
