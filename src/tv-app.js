@@ -1,7 +1,5 @@
 // import stuff
 import { LitElement, html, css } from "lit";
-import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "./tv-channel.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import "./course-title.js";
@@ -10,29 +8,24 @@ export class TvApp extends LitElement {
   constructor() {
     super();
     this.source = new URL("../assets/channels.json", import.meta.url).href;
-    this.listings = [];
-    this.id = "";
-    this.contents = Array(9).fill("");
-    this.currentPage = 0;
-    this.selectedCourse = null;
+    this.listings = []; // To store the listings/data from the JSON file
+    this.id = ""; // To store the id of the course
+    this.selectedCourse = null; // To store the selected course
     this.activeIndex = null; // To keep track of the active index
     this.activeContent = ""; // To store the active content HTML
-    this.itemClick = this.itemClick.bind(this);
-    this.time = "";
+    this.itemClick = this.itemClick.bind(this); // listening to the object that fire the object
+    this.time = ""; // To store the timecode of the content
   }
 
+  // LitElement life cycle for when the element is added to the DOM
   connectedCallback() {
-    super.connectedCallback();
-
-    this.contents.forEach((_, index) => {
-      this.loadContent(index);
-    });
+    super.connectedCallback(); // helps in setting up the initial state of the component
   }
 
-  // convention I enjoy using to define the tag's name
   static get tag() {
     return "tv-app";
   }
+
   // LitElement convention so we update render() when values change
   static get properties() {
     return {
@@ -40,7 +33,6 @@ export class TvApp extends LitElement {
       source: { type: String }, // To fetch the JSON file
       listings: { type: Array },
       selectedCourse: { type: Object },
-      currentPage: { type: Number },
       contents: { type: Array },
       id: { type: String },
       activeIndex: { type: Number },
@@ -61,7 +53,7 @@ export class TvApp extends LitElement {
         .alignContent {
           display: flex;
           justify-content: flex-start;
-          gap: 90px; 
+          gap: 90px;
         }
 
         .course-topics {
@@ -87,8 +79,8 @@ export class TvApp extends LitElement {
           font-size: 1em;
           border: 1px solid #dadce0;
           border-radius: 5px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-          background-color: #f8f9fa; 
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          background-color: #f8f9fa;
           font: 400 16px/24px var(--devsite-primary-font-family);
           -webkit-font-smoothing: antialiased;
           text-size-adjust: 100%;
@@ -162,16 +154,13 @@ export class TvApp extends LitElement {
 
   render() {
     return html`
-      <course-title time = "${this.time}"> 
-      
-      </course-title>
+      <course-title time="${this.time}"> </course-title>
       <div class="alignContent">
         <div class="course-topics">
           ${this.listings.map(
             (item, index) => html`
               <tv-channel
                 title="${item.title}"
-                presenter="${item.metadata.author}"
                 id="${item.id}"
                 @click="${() => this.itemClick(index)}"
                 activeIndex="${this.activeIndex}"
@@ -182,8 +171,10 @@ export class TvApp extends LitElement {
         </div>
 
         <div class="main">
+          <!-- ternary operator to check if the active content is null or not -->
           ${this.activeContent ? unsafeHTML(this.activeContent) : html``}
         </div>
+
         <div class="fabs">
           <div id="previous">
             <button @click=${() => this.prevPage()}>Back</button>
@@ -195,24 +186,10 @@ export class TvApp extends LitElement {
       </div>
     `;
   }
-  closeDialog(e) {
-    const dialog = this.shadowRoot.querySelector(".dialog");
-    dialog.hide();
-  }
-
-  // async progressionBar(activeIndex) {
-  //   console.log("Progress", progress)
-  //   const progressValue = this.shadowRoot.querySelector(".progress-value");
-  //   const progressText = this.shadowRoot.querySelector(".progress-text");
-
-  //   progressValue.style.width = `${(activeIndex + 1) * 10}%`;
-  //   progressText.innerHTML = `${activeIndex + 1} / ${this.listings.length}`;
-
-  // }
 
   async nextPage() {
     if (this.activeIndex !== null) {
-      const nextIndex = (this.activeIndex + 1) % this.listings.length;
+      const nextIndex = this.activeIndex + 1;
       const item = this.listings[nextIndex].location;
 
       const contentPath = "/assets/" + item;
@@ -231,13 +208,11 @@ export class TvApp extends LitElement {
   // function to fetch the previous content
   async prevPage() {
     if (this.activeIndex !== null) {
+      // console.log("Active Index: ", this.activeIndex);
 
-      const prevIndex = 
-        this.activeIndex === 0
-          ? this.listings.length - 1 
-          : this.activeIndex - 1; bcb
-      
-      const item = this.listings[prevIndex].location;
+      const prevIndex = this.activeIndex - 1; // Get the previous index
+
+      const item = this.listings[prevIndex].location; // Get the location of the content
 
       const contentPath = "/assets/" + item;
 
@@ -252,21 +227,25 @@ export class TvApp extends LitElement {
     }
   }
 
-  // Funtion to fetch for the content that is being clicked 
+  // Funtion to fetch for the content that is being clicked
   async itemClick(index) {
-    this.activeIndex = index;
+    this.activeIndex = index; // Update the active index after fetching content
+    // console.log("Active Index: ", this.activeIndex);
 
     const item = this.listings[index].location; // Get the location of the content
-    console.log("Active Content: ", item);
+    // console.log("Active Content: ", item);
 
     this.time = this.listings[index].metadata.timecode; // Get the timecode of the content
-    console.log("Time: ", this.time);
+    // console.log("Time: ", this.time);
 
     const contentPath = "/assets/" + item;
 
+    // add the path to fetch for the content that presist in our assets folder
     try {
       const response = await fetch(contentPath);
+      // console.log("Response: ", response);
       const text = await response.text();
+      // console.log("Text: ", text);
       this.activeContent = text; // Update the active content after fetching
     } catch (err) {
       console.log("fetch failed", err);
