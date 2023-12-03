@@ -1,50 +1,43 @@
 // import stuff
 import { LitElement, html, css } from "lit";
-import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "./tv-channel.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import "./course-title.js";
 
 export class TvApp extends LitElement {
-  // defaults
   constructor() {
     super();
-    this.name = "";
     this.source = new URL("../assets/channels.json", import.meta.url).href;
-    this.listings = [];
-    this.id = "";
-    this.contents = Array(9).fill("");
-    this.currentPage = 0;
-    this.selectedCourse = null;
+    this.listings = []; // To store the listings/data from the JSON file
+    this.id = ""; // To store the id of the course
+    this.selectedCourse = null; // To store the selected course
     this.activeIndex = null; // To keep track of the active index
     this.activeContent = ""; // To store the active content HTML
-    this.itemClick = this.itemClick.bind(this);
+    this.itemClick = this.itemClick.bind(this); // listening to the object that fire the object
+    this.time = ""; // To store the timecode of the content
   }
 
+  // LitElement life cycle for when the element is added to the DOM
   connectedCallback() {
-    super.connectedCallback();
-
-    this.contents.forEach((_, index) => {
-      this.loadContent(index);
-    });
+    super.connectedCallback(); // helps in setting up the initial state of the component
   }
 
-  // convention I enjoy using to define the tag's name
   static get tag() {
     return "tv-app";
   }
+
   // LitElement convention so we update render() when values change
   static get properties() {
     return {
       name: { type: String },
-      source: { type: String },
+      source: { type: String }, // To fetch the JSON file
       listings: { type: Array },
       selectedCourse: { type: Object },
-      currentPage: { type: Number },
       contents: { type: Array },
       id: { type: String },
       activeIndex: { type: Number },
       activeContent: { type: String },
+      // time: { type: String },
     };
   }
   // LitElement convention for applying styles JUST to our element
@@ -60,7 +53,7 @@ export class TvApp extends LitElement {
         .alignContent {
           display: flex;
           justify-content: flex-start;
-          gap: 90px; /* Optional: adjust the gap between course topics and main content */
+          gap: 90px;
         }
 
         .course-topics {
@@ -75,27 +68,26 @@ export class TvApp extends LitElement {
           padding-right: 5px;
         }
 
-       .main {
-        margin: 42px 141px 23px 386px;
-         padding-top: 8px;
-         padding-right: 5px;
-         padding-bottom: 1px;
-         padding-left: 20px;
-         width: calc(100% - 291px);
-         height: 100%;
-         font-size: 1em;
-         border: 1px solid #dadce0;
+        .main {
+          margin: 42px 141px 23px 386px;
+          padding-top: 8px;
+          padding-right: 5px;
+          padding-bottom: 1px;
+          padding-left: 20px;
+          width: calc(100% - 291px);
+          height: 100%;
+          font-size: 1em;
+          border: 1px solid #dadce0;
           border-radius: 5px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow to the right */
-          background-color: #f8f9fa; /* Keep the same background color */
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          background-color: #f8f9fa;
           font: 400 16px/24px var(--devsite-primary-font-family);
           -webkit-font-smoothing: antialiased;
           text-size-adjust: 100%;
           color: #4e5256;
           font-family: var(--devsite-primary-font-family);
           background: #f8f9fa;
-
-       }
+        }
 
         .fabs {
           display: flex;
@@ -105,10 +97,10 @@ export class TvApp extends LitElement {
           bottom: 0;
           right: 0;
           margin: 19px;
-          width: 75vw;
+          width: 81vw;
         }
 
-        #previous>button {
+        #previous > button {
           border-radius: 4px;
           font-family:
             Google Sans,
@@ -127,9 +119,12 @@ export class TvApp extends LitElement {
           background: #fff;
           color: #1a73e8;
           border: 0;
-          box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12), 0 3px 1px -2px rgba(0,0,0,.2);
+          box-shadow:
+            0 2px 2px 0 rgba(0, 0, 0, 0.14),
+            0 1px 5px 0 rgba(0, 0, 0, 0.12),
+            0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
-        #next>button {
+        #next > button {
           border-radius: 4px;
           font-family:
             Google Sans,
@@ -148,7 +143,10 @@ export class TvApp extends LitElement {
           background: #1a73e8;
           color: #fff;
           border: 0;
-          box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12), 0 3px 1px -2px rgba(0,0,0,.2);
+          box-shadow:
+            0 2px 2px 0 rgba(0, 0, 0, 0.14),
+            0 1px 5px 0 rgba(0, 0, 0, 0.12),
+            0 3px 1px -2px rgba(0, 0, 0, 0.2);
         }
       `,
     ];
@@ -156,13 +154,13 @@ export class TvApp extends LitElement {
 
   render() {
     return html`
+      <course-title time="${this.time}"> </course-title>
       <div class="alignContent">
         <div class="course-topics">
           ${this.listings.map(
             (item, index) => html`
               <tv-channel
                 title="${item.title}"
-                presenter="${item.metadata.author}"
                 id="${item.id}"
                 @click="${() => this.itemClick(index)}"
                 activeIndex="${this.activeIndex}"
@@ -173,8 +171,10 @@ export class TvApp extends LitElement {
         </div>
 
         <div class="main">
+          <!-- ternary operator to check if the active content is null or not -->
           ${this.activeContent ? unsafeHTML(this.activeContent) : html``}
         </div>
+
         <div class="fabs">
           <div id="previous">
             <button @click=${() => this.prevPage()}>Back</button>
@@ -186,24 +186,10 @@ export class TvApp extends LitElement {
       </div>
     `;
   }
-  closeDialog(e) {
-    const dialog = this.shadowRoot.querySelector(".dialog");
-    dialog.hide();
-  }
-
-  // async progressionBar(activeIndex) {
-  //   console.log("Progress", progress)
-  //   const progressValue = this.shadowRoot.querySelector(".progress-value");
-  //   const progressText = this.shadowRoot.querySelector(".progress-text");
-
-  //   progressValue.style.width = `${(activeIndex + 1) * 10}%`;
-  //   progressText.innerHTML = `${activeIndex + 1} / ${this.listings.length}`;
-
-  // }
 
   async nextPage() {
     if (this.activeIndex !== null) {
-      const nextIndex = (this.activeIndex + 1) % this.listings.length;
+      const nextIndex = this.activeIndex + 1;
       const item = this.listings[nextIndex].location;
 
       const contentPath = "/assets/" + item;
@@ -219,13 +205,14 @@ export class TvApp extends LitElement {
     }
   }
 
+  // function to fetch the previous content
   async prevPage() {
     if (this.activeIndex !== null) {
-      const prevIndex =
-        this.activeIndex === 0
-          ? this.listings.length - 1
-          : this.activeIndex - 1;
-      const item = this.listings[prevIndex].location;
+      // console.log("Active Index: ", this.activeIndex);
+
+      const prevIndex = this.activeIndex - 1; // Get the previous index
+
+      const item = this.listings[prevIndex].location; // Get the location of the content
 
       const contentPath = "/assets/" + item;
 
@@ -240,25 +227,29 @@ export class TvApp extends LitElement {
     }
   }
 
+  // Funtion to fetch for the content that is being clicked
   async itemClick(index) {
-    this.activeIndex = index;
-    const item = this.listings[index].location;
-    // console.log("Active Content", item);
+    this.activeIndex = index; // Update the active index after fetching content
+    // console.log("Active Index: ", this.activeIndex);
+
+    const item = this.listings[index].location; // Get the location of the content
+    // console.log("Active Content: ", item);
+
+    this.time = this.listings[index].metadata.timecode; // Get the timecode of the content
+    // console.log("Time: ", this.time);
 
     const contentPath = "/assets/" + item;
-    // console.log("Content Path", contentPath);
 
+    // add the path to fetch for the content that presist in our assets folder
     try {
       const response = await fetch(contentPath);
+      // console.log("Response: ", response);
       const text = await response.text();
-      this.activeContent = text;
-      // console.log("Active Content", this.activeContent);
+      // console.log("Text: ", text);
+      this.activeContent = text; // Update the active content after fetching
     } catch (err) {
       console.log("fetch failed", err);
     }
-
-    // const dialog = this.shadowRoot.querySelector('.dialog');
-    // dialog.show();
   }
 
   // LitElement life cycle for when any property changes
@@ -273,6 +264,7 @@ export class TvApp extends LitElement {
     });
   }
 
+  // API fetches the JSON file and updates the listings array
   async updateSourceData(source) {
     await fetch(source)
       .then((resp) => (resp.ok ? resp.json() : []))
@@ -282,10 +274,12 @@ export class TvApp extends LitElement {
           responseData.data.items &&
           responseData.data.items.length > 0
         ) {
-          this.listings = [...responseData.data.items];
+          this.listings = [...responseData.data.items]; // Spread operator to clone the array
+          console.log("Listings: ", this.listings);
         }
       });
   }
 }
+
 // tell the browser about our tag and class it should run when it sees it
 customElements.define(TvApp.tag, TvApp);
