@@ -20,10 +20,18 @@ export class TvApp extends LitElement {
   // LitElement life cycle for when the element is added to the DOM
   connectedCallback() {
     super.connectedCallback(); // helps in setting up the initial state of the component
+    
+    this.contents.forEach((_, index) => {
+      this.loadContent(index);
+  
+    });
   }
+
+  
 
   static get tag() {
     return "tv-app";
+    
   }
 
   // LitElement convention so we update render() when values change

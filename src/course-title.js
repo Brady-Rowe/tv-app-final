@@ -86,9 +86,6 @@ export class CourseTitle extends LitElement {
         color: #5a5e61;
         text-decoration: none;
       }
-      .stopwatch{
-       
-      }
     `;
   }
   // LitElement rendering template of your element
@@ -122,19 +119,6 @@ export class CourseTitle extends LitElement {
 
      
        <div style= "margin:15px">
-        <sl-dropdown>
-          
-  <sl-button slot="trigger" caret>English</sl-button>
-  <sl-menu>
-    <sl-menu-item>English</sl-menu-item>
-    <sl-menu-item>Deutsch</sl-menu-item>
-    <sl-menu-item>Español</sl-menu-item>
-    <sl-menu-item>Français</sl-menu-item>
-    <sl-menu-item>Indonesia</sl-menu-item>
-    <sl-menu-item>Portuguès</sl-menu-item>
-  
-  </sl-menu>
-</sl-dropdown>
 </div>
 
 
