@@ -175,7 +175,7 @@ export class TvApp extends LitElement {
 
         <div class="main">
           <!-- ternary operator to check if the active content is null or not -->
-          ${this.activeContent ? unsafeHTML(this.activeContent) : this.itemClick(0)}
+          ${this.activeContent ? unsafeHTML(this.activeContent) : html``}
         </div>
 
         <div class="fabs">
@@ -199,6 +199,37 @@ export class TvApp extends LitElement {
       this.farthestIndex = parseInt(storedFarthestIndex, 10);
       this.loadActiveContent();
     }
+  }
+  
+  saveState() {
+    localStorage.setItem('activeIndex', this.activeIndex);
+    localStorage.setItem('farthestIndex', this.farthestIndex);
+  
+    
+    if (this.activeIndex === this.listings.length - 1) {
+      localStorage.removeItem('activeIndex');
+      localStorage.removeItem('farthestIndex');
+    }
+  }
+
+
+  async loadData() {
+    // Fetch data from the source
+    await fetch(this.source)
+      .then((resp) => (resp.ok ? resp.json() : []))
+      .then((responseData) => {
+        if (
+          responseData.status === 200 &&
+          responseData.data.items &&
+          responseData.data.items.length > 0
+        ) {
+          this.listings = [...responseData.data.items];
+          this.loadActiveContent();
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   }
 
   async nextPage() {
@@ -261,9 +292,17 @@ export class TvApp extends LitElement {
       const text = await response.text();
       // console.log("Text: ", text);
       this.activeContent = text; // Update the active content after fetching
+      if (this.activeIndex > this.farthestIndex) {
+        this.farthestIndex = this.activeIndex;
+      }
+      this.saveState();
     } catch (err) {
       console.log("fetch failed", err);
     }
+  }
+
+  firstUpdate(){
+    this.activeIndex = 0;
   }
 
   // LitElement life cycle for when any property changes
@@ -276,6 +315,23 @@ export class TvApp extends LitElement {
         this.updateSourceData(this[propName]);
       }
     });
+  }
+
+  loadActiveContent() {
+    if (this.listings && this.listings.length > 0 && this.activeIndex >= 0 && this.activeIndex < this.listings.length) {
+      const item = this.listings[this.activeIndex].location;
+      const contentPath = "/assets/" + item;
+
+      fetch(contentPath)
+        .then((response) => response.text())
+        .then((text) => {
+          this.activeContent = text;
+          this.time = this.listings[this.activeIndex].metadata.timecode;
+        })
+        .catch((error) => {
+          console.error('Error fetching active content:', error);
+        });
+    }
   }
 
   // API fetches the JSON file and updates the listings array
