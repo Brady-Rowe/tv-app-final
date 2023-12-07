@@ -15,11 +15,14 @@ export class TvApp extends LitElement {
     this.activeContent = ""; // To store the active content HTML
     this.itemClick = this.itemClick.bind(this); // listening to the object that fire the object
     this.time = ""; // To store the timecode of the content
+    this.farthestIndex = 0; // To store the farthest index
   }
 
   // LitElement life cycle for when the element is added to the DOM
   connectedCallback() {
     super.connectedCallback(); // helps in setting up the initial state of the component
+    this.loadData();
+    this.loadState(); // Load the stored state on page load
   }
 
   static get tag() {
@@ -172,7 +175,7 @@ export class TvApp extends LitElement {
 
         <div class="main">
           <!-- ternary operator to check if the active content is null or not -->
-          ${this.activeContent ? unsafeHTML(this.activeContent) : html``}
+          ${this.activeContent ? unsafeHTML(this.activeContent) : this.itemClick(0)}
         </div>
 
         <div class="fabs">
@@ -185,6 +188,17 @@ export class TvApp extends LitElement {
         </div>
       </div>
     `;
+  }
+
+
+  loadState() {
+    const storedActiveIndex = localStorage.getItem('activeIndex');
+    const storedFarthestIndex = localStorage.getItem('farthestIndex');
+    if (storedActiveIndex !== null && storedFarthestIndex !== null) {
+      this.activeIndex = parseInt(storedActiveIndex, 10);
+      this.farthestIndex = parseInt(storedFarthestIndex, 10);
+      this.loadActiveContent();
+    }
   }
 
   async nextPage() {
