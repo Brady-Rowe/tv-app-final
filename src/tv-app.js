@@ -1,7 +1,6 @@
 // import stuff
 import { LitElement, html, css } from "lit";
 import "./tv-channel.js";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import "./course-title.js";
 
 export class TvApp extends LitElement {
@@ -156,6 +155,8 @@ export class TvApp extends LitElement {
   }
 
   render() {
+    const isFirstCourse = this.activeIndex === 0;
+    const isLastCourse = this.activeIndex === this.listings.length - 1;
     return html`
       <course-title time="${this.time}"> </course-title>
       <div class="alignContent">
@@ -174,22 +175,35 @@ export class TvApp extends LitElement {
         </div>
 
         <div class="main">
-          <!-- ternary operator to check if the active content is null or not -->
-          ${this.activeContent ? unsafeHTML(this.activeContent) : html``}
-        </div>
+     
+      ${this.renderActiveContent()}
+    </div>
 
         <div class="fabs">
-          <div id="previous">
-            <button @click=${() => this.prevPage()}>Back</button>
-          </div>
-          <div id="next">
-            <button @click=${() => this.nextPage()}>Next</button>
-          </div>
+        <div id="previous" style="${isFirstCourse ? 'display: none;' : ''}">
+          <button @click=${() => this.prevPage()}>Back</button>
+        </div>
+        <div id="next" style="${isLastCourse ? 'display: none;' : ''}">
+          <button @click=${() => this.nextPage()}>Next</button>
+        </div>
         </div>
       </div>
     `;
   }
 
+
+  renderActiveContent() {
+    if (!this.activeContent) {
+      return html``; // Return empty template if no active content
+    }
+  
+    // Create a template element to safely parse the fetched HTML text
+    const template = document.createElement('template');
+    template.innerHTML = this.activeContent;
+    
+    // Return the parsed content within a lit-html template
+    return html`${template.content}`;
+  }
 
   loadState() {
     const storedActiveIndex = localStorage.getItem('activeIndex');
@@ -244,6 +258,7 @@ export class TvApp extends LitElement {
         this.activeContent = await response.text();
         // console.log("Active Content", this.activeContent);
         this.activeIndex = nextIndex; // Update the active index after fetching content
+        this.saveState();
       } catch (err) {
         console.log("fetch failed", err);
       }
@@ -266,6 +281,7 @@ export class TvApp extends LitElement {
         this.activeContent = await response.text();
         // console.log("Active Content", this.activeContent);
         this.activeIndex = prevIndex; // Update the active index after fetching content
+        this.saveState();
       } catch (err) {
         console.log("fetch failed", err);
       }
