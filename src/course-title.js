@@ -127,7 +127,6 @@ export class CourseTitle extends LitElement {
   <sl-button slot="trigger" caret>English</sl-button>
   <sl-menu>
     <sl-menu-item>English</sl-menu-item>
-  
   </sl-menu>
 </sl-dropdown>
 </div>
