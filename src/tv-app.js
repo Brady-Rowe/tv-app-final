@@ -252,6 +252,7 @@ export class TvApp extends LitElement {
       const item = this.listings[nextIndex].location;
 
       const contentPath = "/assets/" + item;
+      this.time = this.listings[nextIndex].metadata.timecode; // Get the timecode of the content
 
       try {
         const response = await fetch(contentPath);
@@ -273,6 +274,7 @@ export class TvApp extends LitElement {
       const prevIndex = this.activeIndex - 1; // Get the previous index
 
       const item = this.listings[prevIndex].location; // Get the location of the content
+      this.time = this.listings[prevIndex].metadata.timecode; // Get the timecode of the content
 
       const contentPath = "/assets/" + item;
 

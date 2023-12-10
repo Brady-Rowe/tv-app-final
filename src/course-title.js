@@ -122,13 +122,10 @@ export class CourseTitle extends LitElement {
 
      
        <div style= "margin:15px">
-        <sl-dropdown>
-          
-  <sl-button slot="trigger" caret>English</sl-button>
-  <sl-menu>
+
+  
     <sl-menu-item>English</sl-menu-item>
-  </sl-menu>
-</sl-dropdown>
+
 </div>
 
 
