@@ -119,6 +119,10 @@ export class CourseTitle extends LitElement {
 
      
        <div style= "margin:15px">
+
+  
+    <sl-menu-item>English</sl-menu-item>
+
 </div>
 
 
